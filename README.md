@@ -9,6 +9,7 @@ A modern **Gmail-style tag input component** built with Angular v20, featuring r
 ## ✨ Features
 
 ### Core Functionality
+
 - 🔍 **Real-time Search** - Debounced search with DummyJSON API integration (300ms delay)
 - 🏷️ **Multi-select Tags** - Email addresses appear as chips with avatars
 - ➕ **Creatable Users** - Create new users when no exact match exists
@@ -19,6 +20,7 @@ A modern **Gmail-style tag input component** built with Angular v20, featuring r
 - 📋 **Reactive Forms** - FormControl-based input with better validation support
 
 ### Technical Highlights
+
 - 🆕 **Angular v20** - Latest features with standalone components
 - 📡 **Signal-based State** - Modern reactive state management
 - 🔄 **RxJS Integration** - Observables with smart debouncing
@@ -29,6 +31,7 @@ A modern **Gmail-style tag input component** built with Angular v20, featuring r
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js (v18 or higher)
 - npm or yarn
 
@@ -60,6 +63,7 @@ Open your browser and navigate to `http://localhost:4200/`
 6. **Send Email** - Click "Send Email" to see selected data logged in console
 
 ### Example Searches
+
 - Try: `John`, `Emily`, `Michael` - Real users from API
 - Try: `newuser@example.com` - Creates new user automatically
 - Try: `Sarah Johnson` - Creates user with generated email
@@ -85,12 +89,14 @@ src/app/
 ## 🔧 Key Components
 
 ### TagInputComponent
+
 - **Search Logic** - Debounced API calls with intelligent caching
 - **Keyboard Navigation** - Full accessibility support
 - **Visual Feedback** - Loading states and hover effects
 - **Smart Creation** - Email detection and auto-generation
 
 ### UserService
+
 - **API Integration** - Real data from DummyJSON users API
 - **Error Handling** - Graceful fallbacks and error management
 - **Data Transformation** - Maps API response to internal User interface
@@ -99,11 +105,13 @@ src/app/
 ## 🎨 Design System
 
 ### User Tags
+
 - **Valid Users**: Blue chips displaying email addresses
 - **Invalid Users**: Red chips for invalid email formats with error messages
 - **Interactive States**: Hover effects and focus management
 
 ### Search Experience
+
 - **Real-time Results**: 300ms debounced search with fresh API calls
 - **Visual Indicators**: Bootstrap spinners and empty states
 - **Email Validation**: Automatic validation with visual error feedback
@@ -120,6 +128,7 @@ npm test           # Run unit tests
 ```
 
 ### Code Style
+
 - **Prettier** - Configured for consistent formatting
 - **ESLint** - Angular and TypeScript best practices
 - **Strict TypeScript** - Maximum type safety
