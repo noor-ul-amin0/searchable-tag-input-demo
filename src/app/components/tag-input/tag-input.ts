@@ -32,25 +32,11 @@ export class TagInputComponent implements OnInit, OnDestroy {
   readonly isLoading = signal(false);
   readonly showSuggestions = signal(false);
   readonly activeSuggestionIndex = signal(-1);
+  readonly errorMessage = signal('');
 
   // Computed values
   readonly hasSelectedUsers = computed(() => this.selectedUsers().length > 0);
   readonly hasSuggestions = computed(() => this.suggestions().length > 0);
-  readonly canCreateNew = computed(() => {
-    const input = this.inputValue().trim();
-    return (
-      input.length > 0 &&
-      !this.userService.hasExactMatch(input) &&
-      !this.selectedUsers().some(
-        (user) =>
-          user.email.toLowerCase() === input.toLowerCase() ||
-          user.name.toLowerCase() === input.toLowerCase()
-      )
-    );
-  });
-  readonly showCreateOption = computed(
-    () => this.canCreateNew() && this.inputValue().trim().length > 0
-  );
 
   constructor(private userService: UserService) {}
 
@@ -88,7 +74,7 @@ export class TagInputComponent implements OnInit, OnDestroy {
         );
 
         this.suggestions.set(filteredUsers);
-        this.showSuggestions.set(filteredUsers.length > 0 || this.canCreateNew());
+        this.showSuggestions.set(filteredUsers.length > 0);
         this.activeSuggestionIndex.set(-1);
         this.isLoading.set(false);
       });
@@ -97,12 +83,16 @@ export class TagInputComponent implements OnInit, OnDestroy {
   onInputChange(value: string): void {
     this.inputValue.set(value);
     this.searchSubject.next(value);
+    // Clear error message when user starts typing
+    if (this.errorMessage()) {
+      this.errorMessage.set('');
+    }
   }
 
   onInputKeydown(event: KeyboardEvent): void {
     const suggestions = this.suggestions();
     const activeIndex = this.activeSuggestionIndex();
-    const totalOptions = suggestions.length + (this.showCreateOption() ? 1 : 0);
+    const totalOptions = suggestions.length;
 
     switch (event.key) {
       case 'ArrowDown':
@@ -123,16 +113,11 @@ export class TagInputComponent implements OnInit, OnDestroy {
 
       case 'Enter':
         event.preventDefault();
-        if (activeIndex >= 0) {
-          if (activeIndex < suggestions.length) {
-            // Select existing user
-            this.selectUser(suggestions[activeIndex]);
-          } else if (this.showCreateOption()) {
-            // Create new user
-            this.createAndSelectNewUser();
-          }
-        } else if (this.inputValue().trim() && this.canCreateNew()) {
-          // Create new user when no suggestion is selected but input is valid
+        if (activeIndex >= 0 && activeIndex < suggestions.length) {
+          // Select existing user from suggestions
+          this.selectUser(suggestions[activeIndex]);
+        } else if (this.inputValue().trim()) {
+          // Create new user from input value
           this.createAndSelectNewUser();
         }
         break;
@@ -157,6 +142,7 @@ export class TagInputComponent implements OnInit, OnDestroy {
     }
 
     this.inputValue.set('');
+    this.errorMessage.set('');
     this.hideSuggestions();
     this.focusInput();
   }
@@ -164,6 +150,11 @@ export class TagInputComponent implements OnInit, OnDestroy {
   removeUser(userId: number): void {
     const filteredUsers = this.selectedUsers().filter((user) => user.id !== userId);
     this.selectedUsers.set(filteredUsers);
+    // Clear error if removing an invalid user fixes the issue
+    const hasInvalidUsers = filteredUsers.some(user => user.isInvalid);
+    if (!hasInvalidUsers) {
+      this.errorMessage.set('');
+    }
     this.focusInput();
   }
 
@@ -177,16 +168,64 @@ export class TagInputComponent implements OnInit, OnDestroy {
 
   onInputFocus(): void {
     if (this.inputValue().trim()) {
-      this.showSuggestions.set(this.hasSuggestions() || this.canCreateNew());
+      this.showSuggestions.set(this.hasSuggestions());
     }
   }
 
   createAndSelectNewUser(): void {
     const input = this.inputValue().trim();
-    if (input && this.canCreateNew()) {
-      const newUser = this.userService.createNewUser(input);
-      this.selectUser(newUser);
+    if (!input) {
+      return;
     }
+
+    // Clear any previous error
+    this.errorMessage.set('');
+
+    // Check if user already exists
+    const alreadySelected = this.selectedUsers().some(
+      (user) =>
+        user.email.toLowerCase() === input.toLowerCase() ||
+        user.name.toLowerCase() === input.toLowerCase()
+    );
+
+    if (alreadySelected) {
+      this.errorMessage.set('This user is already selected');
+      return;
+    }
+
+    // Validate email format
+    const isValidEmail = this.isValidEmail(input);
+    
+    if (!isValidEmail) {
+      // Create user with invalid flag
+      const invalidUser: User = {
+        id: Date.now(), // Use timestamp as unique ID
+        name: input,
+        email: input,
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(input)}&background=ef4444&color=ffffff`,
+        isNew: true,
+        isInvalid: true
+      };
+      
+      this.selectedUsers.set([...this.selectedUsers(), invalidUser]);
+      this.errorMessage.set('Invalid email format. Please enter a valid email address.');
+      this.inputValue.set('');
+      this.hideSuggestions();
+      this.focusInput();
+      return;
+    }
+
+    // Create valid user
+    const newUser = this.userService.createNewUser(input);
+    this.selectUser(newUser);
+  }
+
+  /**
+   * Validate email format
+   */
+  private isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   }
 
   onCreateNewClick(): void {

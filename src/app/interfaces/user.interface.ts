@@ -4,6 +4,7 @@ export interface User {
   email: string;
   avatar: string;
   isNew?: boolean; // Flag to indicate if this is a newly created user
+  isInvalid?: boolean; // Flag to indicate if the email is invalid
 }
 
 // DummyJSON API response interfaces
