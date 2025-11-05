@@ -8,14 +8,14 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Subject, takeUntil, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { UserService } from '../../services/user.service';
 import { User } from '../../interfaces/user.interface';
 
 @Component({
   selector: 'app-tag-input',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './tag-input.html',
   styleUrl: './tag-input.css',
 })
@@ -23,10 +23,11 @@ export class TagInputComponent implements OnInit, OnDestroy {
   @ViewChild('inputRef', { static: true }) inputRef!: ElementRef<HTMLInputElement>;
 
   private readonly destroy$ = new Subject<void>();
-  private readonly searchSubject = new Subject<string>();
+
+  // Reactive form control
+  readonly searchControl = new FormControl('', { nonNullable: true });
 
   // Signals for state management
-  readonly inputValue = signal('');
   readonly selectedUsers = signal<User[]>([]);
   readonly suggestions = signal<User[]>([]);
   readonly isLoading = signal(false);
@@ -50,11 +51,11 @@ export class TagInputComponent implements OnInit, OnDestroy {
   }
 
   private setupSearch(): void {
-    this.searchSubject
+    this.searchControl.valueChanges
       .pipe(
         debounceTime(300),
         distinctUntilChanged(),
-        switchMap((query) => {
+        switchMap((query: string) => {
           if (!query.trim()) {
             this.suggestions.set([]);
             this.showSuggestions.set(false);
@@ -67,7 +68,7 @@ export class TagInputComponent implements OnInit, OnDestroy {
         }),
         takeUntil(this.destroy$)
       )
-      .subscribe((users) => {
+      .subscribe((users: User[]) => {
         // Filter out already selected users
         const filteredUsers = users.filter(
           (user: User) => !this.selectedUsers().some((selected) => selected.id === user.id)
@@ -78,15 +79,6 @@ export class TagInputComponent implements OnInit, OnDestroy {
         this.activeSuggestionIndex.set(-1);
         this.isLoading.set(false);
       });
-  }
-
-  onInputChange(value: string): void {
-    this.inputValue.set(value);
-    this.searchSubject.next(value);
-    // Clear error message when user starts typing
-    if (this.errorMessage()) {
-      this.errorMessage.set('');
-    }
   }
 
   onInputKeydown(event: KeyboardEvent): void {
@@ -116,7 +108,7 @@ export class TagInputComponent implements OnInit, OnDestroy {
         if (activeIndex >= 0 && activeIndex < suggestions.length) {
           // Select existing user from suggestions
           this.selectUser(suggestions[activeIndex]);
-        } else if (this.inputValue().trim()) {
+        } else if (this.searchControl.value.trim()) {
           // Create new user from input value
           this.createAndSelectNewUser();
         }
@@ -127,7 +119,7 @@ export class TagInputComponent implements OnInit, OnDestroy {
         break;
 
       case 'Backspace':
-        if (!this.inputValue() && this.hasSelectedUsers()) {
+        if (!this.searchControl.value && this.hasSelectedUsers()) {
           const users = this.selectedUsers();
           this.selectedUsers.set(users.slice(0, -1));
         }
@@ -141,7 +133,7 @@ export class TagInputComponent implements OnInit, OnDestroy {
       this.selectedUsers.set([...currentUsers, user]);
     }
 
-    this.inputValue.set('');
+    this.searchControl.setValue('');
     this.errorMessage.set('');
     this.hideSuggestions();
     this.focusInput();
@@ -167,13 +159,13 @@ export class TagInputComponent implements OnInit, OnDestroy {
   }
 
   onInputFocus(): void {
-    if (this.inputValue().trim()) {
+    if (this.searchControl.value.trim()) {
       this.showSuggestions.set(this.hasSuggestions());
     }
   }
 
   createAndSelectNewUser(): void {
-    const input = this.inputValue().trim();
+    const input = this.searchControl.value.trim();
     if (!input) {
       return;
     }
@@ -211,7 +203,7 @@ export class TagInputComponent implements OnInit, OnDestroy {
 
       this.selectedUsers.set([...this.selectedUsers(), invalidUser]);
       this.errorMessage.set('Invalid email format. Please enter a valid email address.');
-      this.inputValue.set('');
+      this.searchControl.setValue('');
       this.hideSuggestions();
       this.focusInput();
       return;

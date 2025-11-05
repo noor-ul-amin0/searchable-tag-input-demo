@@ -49,8 +49,7 @@
       <input
         #inputRef
         type="text"
-        [value]="inputValue()"
-        (input)="onInputChange($any($event.target).value)"
+        [formControl]="searchControl"
         (keydown)="onInputKeydown($event)"
         (focus)="onInputFocus()"
         (blur)="onInputBlur()"
@@ -104,11 +103,11 @@
 
   <!-- No Results Message -->
   <div
-    *ngIf="showSuggestions() && !hasSuggestions() && !isLoading() && inputValue().trim()"
+    *ngIf="showSuggestions() && !hasSuggestions() && !isLoading() && searchControl.value.trim()"
     class="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg"
   >
     <div class="px-3 py-4 text-center text-gray-500 text-sm">
-      No users found. Press Enter to add "{{ inputValue().trim() }}"
+      No users found. Press Enter to add "{{ searchControl.value.trim() }}"
     </div>
   </div>
 
