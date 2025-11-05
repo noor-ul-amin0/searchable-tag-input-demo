@@ -4,25 +4,26 @@ A modern **Gmail-style tag input component** built with Angular v20, featuring r
 
 ![Angular](https://img.shields.io/badge/Angular-v20-red?style=flat-square&logo=angular)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?style=flat-square&logo=typescript)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-v4-38B2AC?style=flat-square&logo=tailwind-css)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-v5.3-7952B3?style=flat-square&logo=bootstrap)
 
 ## ✨ Features
 
 ### Core Functionality
 - 🔍 **Real-time Search** - Debounced search with DummyJSON API integration (300ms delay)
-- 🏷️ **Multi-select Tags** - Users appear as chips with avatar, name, and email
+- 🏷️ **Multi-select Tags** - Email addresses appear as chips with avatars
 - ➕ **Creatable Users** - Create new users when no exact match exists
 - ⌨️ **Full Keyboard Support** - Arrow keys, Enter, Escape, Backspace navigation
 - 🖱️ **Click Interactions** - Mouse hover and click selection
-- ⚡ **Loading States** - Visual spinner during search operations
-- 🎨 **Visual Differentiation** - New users display with green styling and "NEW" badge
+- ⚡ **Loading States** - Bootstrap spinner during search operations
+- ✅ **Email Validation** - Invalid emails shown in red with error messages
+- 📋 **Reactive Forms** - FormControl-based input with better validation support
 
 ### Technical Highlights
 - 🆕 **Angular v20** - Latest features with standalone components
 - 📡 **Signal-based State** - Modern reactive state management
-- 🔄 **RxJS Integration** - Observables with smart debouncing and caching
+- 🔄 **RxJS Integration** - Observables with smart debouncing
 - 🎯 **TypeScript Strict Mode** - Full type safety and error prevention
-- 🎨 **TailwindCSS v4** - Modern utility-first styling
+- 🎨 **Bootstrap v5.3** - Modern responsive framework with utility classes
 - 📱 **Responsive Design** - Mobile-friendly interface
 
 ## 🚀 Quick Start
@@ -91,21 +92,21 @@ src/app/
 
 ### UserService
 - **API Integration** - Real data from DummyJSON users API
-- **Caching System** - Performance optimization for repeated searches
 - **Error Handling** - Graceful fallbacks and error management
 - **Data Transformation** - Maps API response to internal User interface
+- **Email Validation** - Validates email format for custom entries
 
 ## 🎨 Design System
 
 ### User Tags
-- **Existing Users**: Blue chips with standard styling
-- **New Users**: Green chips with "NEW" badge
+- **Valid Users**: Blue chips displaying email addresses
+- **Invalid Users**: Red chips for invalid email formats with error messages
 - **Interactive States**: Hover effects and focus management
 
 ### Search Experience
-- **Real-time Results**: 300ms debounced search
-- **Visual Indicators**: Loading spinners and empty states
-- **Create Option**: Prominent "Create new" suggestion when applicable
+- **Real-time Results**: 300ms debounced search with fresh API calls
+- **Visual Indicators**: Bootstrap spinners and empty states
+- **Email Validation**: Automatic validation with visual error feedback
 
 ## 🛠️ Development
 
@@ -156,7 +157,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 - [Angular Team](https://angular.io/) - For the amazing framework
 - [DummyJSON](https://dummyjson.com/) - For providing realistic test data
-- [TailwindCSS](https://tailwindcss.com/) - For the utility-first CSS framework
+- [Bootstrap](https://getbootstrap.com/) - For the powerful responsive framework
 - [UI Avatars](https://ui-avatars.com/) - For generated user avatars
 
 ---
