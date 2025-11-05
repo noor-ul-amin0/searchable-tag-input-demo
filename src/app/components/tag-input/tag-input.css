@@ -1,21 +1,21 @@
 /* Tag Input Component Styles */
 
 /* Custom scrollbar for suggestions dropdown */
-:host ::ng-deep .max-h-60::-webkit-scrollbar {
+:host ::ng-deep .overflow-auto::-webkit-scrollbar {
   width: 6px;
 }
 
-:host ::ng-deep .max-h-60::-webkit-scrollbar-track {
+:host ::ng-deep .overflow-auto::-webkit-scrollbar-track {
   background: #f1f5f9;
   border-radius: 3px;
 }
 
-:host ::ng-deep .max-h-60::-webkit-scrollbar-thumb {
+:host ::ng-deep .overflow-auto::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 3px;
 }
 
-:host ::ng-deep .max-h-60::-webkit-scrollbar-thumb:hover {
+:host ::ng-deep .overflow-auto::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
 
@@ -35,9 +35,18 @@
   }
 }
 
-/* Focus styles */
-.tag-input-container:focus-within {
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+/* Hover effect for suggestion items */
+button:hover {
+  background-color: #f8f9fa !important;
 }
 
-/* Loading spinner animation is handled by Tailwind's animate-spin class */
+/* Custom button close styles for colored tags */
+.btn-close-primary {
+  filter: brightness(0) saturate(100%) invert(29%) sepia(93%) saturate(1234%) hue-rotate(197deg)
+    brightness(94%) contrast(92%);
+}
+
+.btn-close-danger {
+  filter: brightness(0) saturate(100%) invert(28%) sepia(96%) saturate(2738%) hue-rotate(346deg)
+    brightness(92%) contrast(94%);
+}
