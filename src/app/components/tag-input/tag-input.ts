@@ -151,7 +151,7 @@ export class TagInputComponent implements OnInit, OnDestroy {
     const filteredUsers = this.selectedUsers().filter((user) => user.id !== userId);
     this.selectedUsers.set(filteredUsers);
     // Clear error if removing an invalid user fixes the issue
-    const hasInvalidUsers = filteredUsers.some(user => user.isInvalid);
+    const hasInvalidUsers = filteredUsers.some((user) => user.isInvalid);
     if (!hasInvalidUsers) {
       this.errorMessage.set('');
     }
@@ -195,18 +195,20 @@ export class TagInputComponent implements OnInit, OnDestroy {
 
     // Validate email format
     const isValidEmail = this.isValidEmail(input);
-    
+
     if (!isValidEmail) {
       // Create user with invalid flag
       const invalidUser: User = {
         id: Date.now(), // Use timestamp as unique ID
         name: input,
         email: input,
-        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(input)}&background=ef4444&color=ffffff`,
+        avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(
+          input
+        )}&background=ef4444&color=ffffff`,
         isNew: true,
-        isInvalid: true
+        isInvalid: true,
       };
-      
+
       this.selectedUsers.set([...this.selectedUsers(), invalidUser]);
       this.errorMessage.set('Invalid email format. Please enter a valid email address.');
       this.inputValue.set('');
