@@ -11,26 +11,15 @@ export class UserService {
   private nextId = 1000; // Start new IDs from 1000 to avoid conflicts
   private readonly apiUrl = 'https://dummyjson.com/users/search';
 
-  // Cache for searched users to improve performance and enable exact matching
-  private searchCache = new Map<string, User[]>();
-
   searchUsers(query: string): Observable<User[]> {
     if (!query.trim()) {
       return of([]);
-    }
-
-    // Check cache first
-    const cacheKey = query.toLowerCase().trim();
-    if (this.searchCache.has(cacheKey)) {
-      return of(this.searchCache.get(cacheKey)!);
     }
 
     // Make API call to DummyJSON
     return this.http.get<DummyJsonResponse>(`${this.apiUrl}?q=${encodeURIComponent(query)}`).pipe(
       map((response) => {
         const users = response.users.map(this.transformDummyJsonUser);
-        // Cache the results
-        this.searchCache.set(cacheKey, users);
         return users;
       }),
       catchError((error) => {
@@ -50,17 +39,6 @@ export class UserService {
       email: dummyUser.email,
       avatar: dummyUser.image,
     };
-  }
-
-  getUserById(id: number): User | undefined {
-    // Search through cached results
-    for (const users of this.searchCache.values()) {
-      const found = users.find((user) => user.id === id);
-      if (found) {
-        return found;
-      }
-    }
-    return undefined;
   }
 
   /**
@@ -104,28 +82,8 @@ export class UserService {
   /**
    * Check if a string is a valid email format
    */
-  private isValidEmail(email: string): boolean {
+  isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
-  }
-
-  /**
-   * Check if the input matches any existing users exactly
-   */
-  hasExactMatch(query: string): boolean {
-    const trimmedQuery = query.trim().toLowerCase();
-
-    // Check through cached search results
-    for (const users of this.searchCache.values()) {
-      const hasMatch = users.some(
-        (user: User) =>
-          user.email.toLowerCase() === trimmedQuery || user.name.toLowerCase() === trimmedQuery
-      );
-      if (hasMatch) {
-        return true;
-      }
-    }
-
-    return false;
   }
 }
